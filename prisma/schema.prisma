@@ -21,7 +21,7 @@ model Course {
   title String @unique
   color String
 
-  user    User @relation(fields: [user_id], references: [id])
+  user    User @relation(fields: [user_id], references: [id], onDelete: Cascade)
   user_id Int
 
   tasks Task[]
@@ -36,6 +36,6 @@ model Task {
   updated_at  DateTime @updatedAt
   due_time    DateTime
 
-  course    Course @relation(fields: [course_id], references: [id])
+  course    Course @relation(fields: [course_id], references: [id], onDelete: Cascade)
   course_id Int
 }

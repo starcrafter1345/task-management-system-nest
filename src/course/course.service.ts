@@ -1,26 +1,71 @@
 import { Injectable } from "@nestjs/common";
 import { CreateCourseDto } from "./dto/create-course.dto";
 import { UpdateCourseDto } from "./dto/update-course.dto";
+import { PrismaService } from "../prisma/prisma.service";
+import { Prisma } from "@prisma/client";
+import type { UserPayload } from "../auth/user-payload";
+import { CoursesEntity } from "./entities/courses.entity";
+import { CourseEntity } from "./entities/course.entity";
 
 @Injectable()
 export class CourseService {
-  create(createCourseDto: CreateCourseDto) {
-    return "This action adds a new course";
+  constructor(private prisma: PrismaService) {}
+
+  async create(
+    createCourseDto: CreateCourseDto,
+    user: UserPayload,
+  ): Promise<CourseEntity> {
+    return this.prisma.course.create({
+      data: {
+        ...createCourseDto,
+        user: {
+          connect: { id: Number(user.sub) },
+        },
+      },
+      omit: {
+        user_id: true,
+      },
+    });
   }
 
-  findAll() {
-    return `This action returns all course`;
+  async findAll(): Promise<CoursesEntity> {
+    const courses = await this.prisma.course.findMany({
+      include: { _count: { select: { tasks: true } } },
+      omit: {
+        user_id: true,
+      },
+    });
+
+    return courses.map(({ _count, ...rest }) => ({
+      ...rest,
+      taskCount: _count?.tasks ?? 0,
+    }));
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} course`;
+  async findOne(
+    courseWhereUniqueInput: Prisma.CourseWhereUniqueInput,
+  ): Promise<CourseEntity | null> {
+    return this.prisma.course.findUnique({
+      where: courseWhereUniqueInput,
+      include: {
+        tasks: true,
+      },
+      omit: { user_id: true },
+    });
   }
 
-  update(id: number, updateCourseDto: UpdateCourseDto) {
-    return `This action updates a #${id} course`;
+  update(
+    courseWhereUniqueInput: Prisma.CourseWhereUniqueInput,
+    updateCourseDto: UpdateCourseDto,
+  ): Promise<CourseEntity> {
+    return this.prisma.course.update({
+      where: courseWhereUniqueInput,
+      data: updateCourseDto,
+      omit: { user_id: true },
+    });
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} course`;
+  async remove(courseWhereUniqueInput: Prisma.CourseWhereUniqueInput) {
+    return this.prisma.course.delete({ where: courseWhereUniqueInput });
   }
 }
