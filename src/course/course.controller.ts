@@ -48,7 +48,7 @@ export class CourseController {
     return this.courseService.update({ id: +id }, updateCourseDto);
   }
 
-  @HttpCode(HttpStatus.OK)
+  @HttpCode(HttpStatus.NO_CONTENT)
   @Delete(":id")
   async remove(@Param("id") id: string) {
     await this.courseService.remove({ id: +id });

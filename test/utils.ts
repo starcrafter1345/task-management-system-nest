@@ -18,6 +18,7 @@ export const settingUpApp = async (
 
   await prisma.user.deleteMany();
   await prisma.course.deleteMany();
+  await prisma.task.deleteMany();
 
   return app;
 };
