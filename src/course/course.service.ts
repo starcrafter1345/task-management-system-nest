@@ -28,8 +28,9 @@ export class CourseService {
     });
   }
 
-  async findAll(): Promise<CoursesEntity> {
+  async findAll(user_id: number): Promise<CoursesEntity> {
     const courses = await this.prisma.course.findMany({
+      where: { user_id },
       include: { _count: { select: { tasks: true } } },
       omit: {
         user_id: true,
