@@ -29,8 +29,8 @@ export class CourseController {
   }
 
   @Get()
-  findAll() {
-    return this.courseService.findAll();
+  findAll(@User() user: UserPayload) {
+    return this.courseService.findAll(+user.sub);
   }
 
   @Get(":id")
