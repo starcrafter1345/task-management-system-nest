@@ -1,13 +1,11 @@
-import { Course } from "@prisma/client";
-import { ApiProperty } from "@nestjs/swagger";
+import { z } from "zod";
+import { htmlColorInputSchema } from "../dto/create-course.dto";
+import { createZodDto } from "nestjs-zod";
 
-export class CourseEntity implements Omit<Course, "user_id"> {
-  @ApiProperty()
-  id: number;
+export const CourseEntitySchema = z.object({
+  id: z.number(),
+  title: z.string(),
+  color: htmlColorInputSchema,
+});
 
-  @ApiProperty()
-  title: string;
-
-  @ApiProperty()
-  color: string;
-}
+export class CourseEntity extends createZodDto(CourseEntitySchema) {}

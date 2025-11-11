@@ -1,7 +1,7 @@
 import { createZodDto } from "nestjs-zod";
 import { z } from "zod";
 
-const htmlColorInputSchema = z.string().regex(/^#[0-9a-fA-F]{6}$/, {
+export const htmlColorInputSchema = z.string().regex(/^#[0-9a-fA-F]{6}$/, {
   message:
     "Invalid color format. Must be a 7-character hex code (e.g., #RRGGBB).",
 });

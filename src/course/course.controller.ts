@@ -17,13 +17,9 @@ import { UpdateCourseDto } from "./dto/update-course.dto";
 import { AuthGuard } from "../auth/auth.guard";
 import { User } from "../auth/user.decorator";
 import type { UserPayload } from "../auth/user-payload";
-import {
-  ApiBearerAuth,
-  ApiCreatedResponse,
-  ApiNoContentResponse,
-  ApiOkResponse,
-} from "@nestjs/swagger";
+import { ApiBearerAuth, ApiNoContentResponse } from "@nestjs/swagger";
 import { CourseEntity } from "./entities/course.entity";
+import { ZodResponse } from "nestjs-zod";
 
 @ApiBearerAuth()
 @Controller("course")
@@ -32,7 +28,8 @@ export class CourseController {
   constructor(private readonly courseService: CourseService) {}
 
   @Post()
-  @ApiCreatedResponse({
+  @ZodResponse({
+    status: HttpStatus.CREATED,
     type: CourseEntity,
   })
   create(
@@ -43,30 +40,17 @@ export class CourseController {
   }
 
   @Get()
-  @ApiOkResponse({
-    type: CourseEntity,
-    isArray: true,
-    example: [
-      {
-        id: 0,
-        title: "Math101",
-        color: "#ff0000",
-        taskCount: 2,
-      },
-      {
-        id: 1,
-        title: "English",
-        color: "#0000ff",
-        taskCount: 0,
-      },
-    ],
+  @ZodResponse({
+    status: HttpStatus.OK,
+    type: [CourseEntity],
   })
   findAll(@User() user: UserPayload) {
     return this.courseService.findAll(+user.sub);
   }
 
   @Get(":id")
-  @ApiOkResponse({
+  @ZodResponse({
+    status: HttpStatus.OK,
     type: CourseEntity,
   })
   async findOne(@Param("id") id: string) {
@@ -79,7 +63,8 @@ export class CourseController {
   }
 
   @Patch(":id")
-  @ApiOkResponse({
+  @ZodResponse({
+    status: HttpStatus.OK,
     type: CourseEntity,
   })
   update(@Param("id") id: string, @Body() updateCourseDto: UpdateCourseDto) {

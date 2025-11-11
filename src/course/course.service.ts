@@ -4,7 +4,6 @@ import { UpdateCourseDto } from "./dto/update-course.dto";
 import { PrismaService } from "../prisma/prisma.service";
 import { Prisma } from "@prisma/client";
 import type { UserPayload } from "../auth/user-payload";
-import { CoursesEntity } from "./entities/courses.entity";
 import { CourseEntity } from "./entities/course.entity";
 
 @Injectable()
@@ -28,7 +27,7 @@ export class CourseService {
     });
   }
 
-  async findAll(user_id: number): Promise<CoursesEntity> {
+  async findAll(user_id: number): Promise<CourseEntity[]> {
     const courses = await this.prisma.course.findMany({
       where: { user_id },
       include: { _count: { select: { tasks: true } } },

@@ -1,28 +1,15 @@
-import { Task } from "@prisma/client";
-import { ApiProperty } from "@nestjs/swagger";
+import { z } from "zod";
+import { createZodDto } from "nestjs-zod";
 
-export class TaskEntity implements Task {
-  @ApiProperty()
-  id: number;
+const TaskEntitySchema = z.object({
+  id: z.number(),
+  name: z.string(),
+  description: z.string().nullable(),
+  completed: z.boolean(),
+  due_time: z.iso.datetime(),
+  created_at: z.iso.datetime(),
+  updated_at: z.iso.datetime(),
+  course_id: z.number(),
+});
 
-  @ApiProperty()
-  course_id: number;
-
-  @ApiProperty()
-  name: string;
-
-  @ApiProperty({ type: String })
-  description: string | null;
-
-  @ApiProperty()
-  completed: boolean;
-
-  @ApiProperty({ format: "date-time", type: String })
-  due_time: Date;
-
-  @ApiProperty({ format: "date-time", type: String })
-  created_at: Date;
-
-  @ApiProperty({ format: "date-time", type: String })
-  updated_at: Date;
-}
+export class TaskEntity extends createZodDto(TaskEntitySchema) {}
