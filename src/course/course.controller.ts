@@ -1,15 +1,15 @@
 import {
-  Controller,
-  Get,
-  Post,
   Body,
-  Patch,
-  Param,
+  Controller,
   Delete,
-  UseGuards,
+  Get,
   HttpCode,
   HttpStatus,
   NotFoundException,
+  Param,
+  Patch,
+  Post,
+  UseGuards,
 } from "@nestjs/common";
 import { CourseService } from "./course.service";
 import { CreateCourseDto } from "./dto/create-course.dto";
@@ -20,6 +20,7 @@ import type { UserPayload } from "../auth/user-payload";
 import { ApiBearerAuth, ApiNoContentResponse } from "@nestjs/swagger";
 import { CourseEntity } from "./entities/course.entity";
 import { ZodResponse } from "nestjs-zod";
+import { CoursesEntity } from "./entities/courses.entity";
 
 @ApiBearerAuth()
 @Controller("course")
@@ -42,7 +43,7 @@ export class CourseController {
   @Get()
   @ZodResponse({
     status: HttpStatus.OK,
-    type: [CourseEntity],
+    type: CoursesEntity,
   })
   findAll(@User() user: UserPayload) {
     return this.courseService.findAll(+user.sub);

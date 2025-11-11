@@ -8,4 +8,5 @@ const UpdateTaskSchema = z.object({
   due_time: z.iso.datetime().optional(),
   course_id: z.number().optional(),
 });
+
 export class UpdateTaskDto extends createZodDto(UpdateTaskSchema) {}

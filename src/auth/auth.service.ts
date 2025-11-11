@@ -8,7 +8,7 @@ import { CreateUserDto } from "./dto/create-user.dto";
 import { CredentialsDto } from "./dto/credentials.dto";
 import { UserService } from "../user/user.service";
 import bcrypt from "bcrypt";
-import { Prisma, User } from "@prisma/client";
+import { Prisma } from "@prisma/client";
 import { JwtService } from "@nestjs/jwt";
 
 @Injectable()
@@ -17,6 +17,7 @@ export class AuthService {
     private userService: UserService,
     private jwtService: JwtService,
   ) {}
+
   private async accessTokenGenerator(
     payload: Record<string, any>,
   ): Promise<{ access_token: string }> {

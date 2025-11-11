@@ -1,16 +1,4 @@
-import {
-  Controller,
-  Get,
-  Post,
-  Body,
-  Patch,
-  Param,
-  Delete,
-} from "@nestjs/common";
-import { UserService } from "./user.service";
-import { CreateUserDto } from "../auth/dto/create-user.dto";
-import { UpdateUserDto } from "../auth/dto/update-user.dto";
-import { CredentialsDto } from "../auth/dto/credentials.dto";
+import { Controller } from "@nestjs/common";
 
 @Controller("auth")
 export class UserController {
