@@ -20,12 +20,19 @@ import type { UserPayload } from "../auth/user-payload";
 import { ApiBearerAuth } from "@nestjs/swagger";
 import { ZodResponse } from "nestjs-zod";
 import { TaskEntity } from "./entities/task.entity";
+import { StatisticsEntity } from "./dto/statistics.entity";
 
 @ApiBearerAuth()
 @Controller("task")
 @UseGuards(AuthGuard)
 export class TaskController {
   constructor(private readonly taskService: TaskService) {}
+
+  @Get("/stats")
+  @ZodResponse({ status: HttpStatus.OK, type: StatisticsEntity })
+  stats(@User() user: UserPayload) {
+    return this.taskService.stats(+user.sub);
+  }
 
   @Post()
   @ZodResponse({ status: HttpStatus.CREATED, type: TaskEntity })

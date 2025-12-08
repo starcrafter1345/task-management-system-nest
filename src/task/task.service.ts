@@ -4,10 +4,50 @@ import { UpdateTaskDto } from "./dto/update-task.dto";
 import { PrismaService } from "../prisma/prisma.service";
 import { Prisma, Task } from "@prisma/client";
 import { TaskEntity } from "./entities/task.entity";
+import { StatisticsEntity } from "./dto/statistics.entity";
 
 @Injectable()
 export class TaskService {
   constructor(private prisma: PrismaService) {}
+
+  async stats(user_id: number): Promise<StatisticsEntity> {
+    const [total, completed, inProgress, overdue] = await Promise.all([
+      this.prisma.task.count({ where: { course: { is: { user_id } } } }),
+      this.prisma.task.count({
+        where: {
+          AND: [
+            { course: { is: { user_id } } },
+            { completed: { equals: true } },
+          ],
+        },
+      }),
+      this.prisma.task.count({
+        where: {
+          AND: [
+            { course: { is: { user_id } } },
+            { completed: { equals: false } },
+            { due_time: { lt: new Date() } },
+          ],
+        },
+      }),
+      this.prisma.task.count({
+        where: {
+          AND: [
+            { course: { is: { user_id } } },
+            { completed: { equals: false } },
+            { due_time: { gt: new Date() } },
+          ],
+        },
+      }),
+    ]);
+
+    return {
+      total,
+      completed,
+      inProgress,
+      overdue,
+    };
+  }
 
   async create(createTaskDto: CreateTaskDto): Promise<TaskEntity> {
     const task = await this.prisma.task.create({ data: createTaskDto });
