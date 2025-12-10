@@ -1,7 +1,7 @@
 import { z } from "zod";
 import { createZodDto } from "nestjs-zod";
 
-const TaskEntitySchema = z.object({
+export const TaskEntitySchema = z.object({
   id: z.number(),
   name: z.string(),
   description: z.string().nullable(),

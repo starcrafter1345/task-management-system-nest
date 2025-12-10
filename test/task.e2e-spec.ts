@@ -105,6 +105,20 @@ describe("task", () => {
     task = changedTask.body;
   });
 
+  it("GET /task/stats", async () => {
+    const stats = await request(app.getHttpServer())
+      .get("/task/stats")
+      .set("Authorization", `Bearer ${token}`);
+
+    expect(stats.status).toBe(200);
+    expect(stats.body).toEqual({
+      total: 2,
+      inProgress: 1,
+      completed: 1,
+      overdue: 0,
+    });
+  });
+
   it("DELETE /task/:id", async () => {
     let deleteTask = await request(app.getHttpServer())
       .delete(`/task/${task.id}`)

@@ -6,6 +6,9 @@ import { Prisma } from "@prisma/client";
 import type { UserPayload } from "../auth/user-payload";
 import { CourseEntity } from "./entities/course.entity";
 import { CoursesEntity } from "./entities/courses.entity";
+import { CourseWithTasksEntity } from "./entities/courseWithTasks.entity";
+import { TaskEntity } from "../task/entities/task.entity";
+import { CoursesWithTasksEntity } from "./entities/coursesWithTasks.entity";
 
 @Injectable()
 export class CourseService {
@@ -43,19 +46,55 @@ export class CourseService {
     }));
   }
 
+  async findAllWithTasks(user_id: number): Promise<CoursesWithTasksEntity> {
+    const coursesWithTasks = await this.prisma.course.findMany({
+      where: { user_id },
+      include: { tasks: { take: 5 } },
+      omit: { user_id: true },
+    });
+
+    return coursesWithTasks.map((course) => ({
+      ...course,
+      tasks: course.tasks.map((task) => ({
+        ...task,
+        created_at: task.created_at.toISOString(),
+        updated_at: task.updated_at.toISOString(),
+        due_time: task.due_time.toISOString(),
+      })),
+    }));
+  }
+
   async findOne(
     courseWhereUniqueInput: Prisma.CourseWhereUniqueInput,
-  ): Promise<CourseEntity | null> {
-    return this.prisma.course.findUnique({
+  ): Promise<CourseWithTasksEntity | null> {
+    const courseWithTasks = await this.prisma.course.findUnique({
       where: courseWhereUniqueInput,
       include: {
         tasks: true,
       },
       omit: { user_id: true },
     });
+
+    if (courseWithTasks) {
+      const transformedTasks = courseWithTasks.tasks.map(
+        (task): TaskEntity => ({
+          ...task,
+          created_at: task.created_at.toISOString(),
+          updated_at: task.updated_at.toISOString(),
+          due_time: task.due_time.toISOString(),
+        }),
+      );
+
+      return {
+        ...courseWithTasks,
+        tasks: transformedTasks,
+      };
+    }
+
+    return null;
   }
 
-  update(
+  async update(
     courseWhereUniqueInput: Prisma.CourseWhereUniqueInput,
     updateCourseDto: UpdateCourseDto,
   ): Promise<CourseEntity> {

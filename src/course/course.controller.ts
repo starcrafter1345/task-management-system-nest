@@ -20,7 +20,9 @@ import type { UserPayload } from "../auth/user-payload";
 import { ApiBearerAuth, ApiNoContentResponse } from "@nestjs/swagger";
 import { CourseEntity } from "./entities/course.entity";
 import { ZodResponse } from "nestjs-zod";
+import { CourseWithTasksEntity } from "./entities/courseWithTasks.entity";
 import { CoursesEntity } from "./entities/courses.entity";
+import { CoursesWithTasksEntity } from "./entities/coursesWithTasks.entity";
 
 @ApiBearerAuth()
 @Controller("course")
@@ -40,7 +42,16 @@ export class CourseController {
     return this.courseService.create(createCourseDto, user);
   }
 
-  @Get()
+  @Get("/overview")
+  @ZodResponse({
+    status: HttpStatus.OK,
+    type: CoursesWithTasksEntity,
+  })
+  findAllWithTasks(@User() user: UserPayload) {
+    return this.courseService.findAllWithTasks(+user.sub);
+  }
+
+  @Get("/sidebar")
   @ZodResponse({
     status: HttpStatus.OK,
     type: CoursesEntity,
@@ -52,7 +63,7 @@ export class CourseController {
   @Get(":id")
   @ZodResponse({
     status: HttpStatus.OK,
-    type: CourseEntity,
+    type: CourseWithTasksEntity,
   })
   async findOne(@Param("id") id: string) {
     const course = await this.courseService.findOne({ id: +id });
