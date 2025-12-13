@@ -59,7 +59,8 @@ describe("task", () => {
     expect(allTasks.status).toBe(200);
     expect(allTasks.body).toMatchObject([
       {
-        course_title: "Math 101",
+        id: course.id,
+        title: course.title,
         tasks: [task],
       },
     ]);
@@ -84,7 +85,8 @@ describe("task", () => {
     expect(allTasks.status).toBe(200);
     expect(allTasks.body).toMatchObject([
       {
-        course_title: "Math 101",
+        id: course.id,
+        title: course.title,
         tasks: expect.arrayContaining([task, secondTask]),
       },
     ]);
@@ -142,7 +144,8 @@ describe("task", () => {
 
     expect(allTasks.body).toMatchObject([
       {
-        course_title: "Math 101",
+        id: course.id,
+        title: course.title,
         tasks: [secondTask],
       },
     ]);

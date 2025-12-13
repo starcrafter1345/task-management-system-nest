@@ -63,11 +63,15 @@ export class TaskService {
   async findAll(user_id: number): Promise<TasksGroupedByCourse> {
     const coursesWithTasks = await this.prisma.course.findMany({
       where: { user_id },
-      select: { title: true, tasks: { take: 5, orderBy: { due_time: "asc" } } },
+      select: {
+        title: true,
+        id: true,
+        tasks: { take: 5, orderBy: { due_time: "asc" } },
+      },
     });
 
     return coursesWithTasks.map((course) => ({
-      course_title: course.title,
+      ...course,
       tasks: course.tasks.map((task) => ({
         ...task,
         created_at: task.created_at.toISOString(),
