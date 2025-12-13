@@ -5,14 +5,15 @@ import { PrismaService } from "../src/prisma/prisma.service";
 import { settingUpApp } from "./utils";
 import { CourseEntity } from "../src/course/entities/course.entity";
 import { CreateTaskDto } from "../src/task/dto/create-task.dto";
+import { TaskEntity } from "../src/task/entities/task.entity";
 
 describe("task", () => {
   let app: INestApplication;
   const prisma = new PrismaService();
   let token: string;
   let course: CourseEntity;
-  let task;
-  let secondTask;
+  let task: TaskEntity;
+  let secondTask: TaskEntity;
 
   beforeAll(async () => (app = await settingUpApp(prisma)));
 
@@ -47,7 +48,7 @@ describe("task", () => {
     expect(req.status).toBe(201);
     expect(req.body).toMatchObject(newTask);
 
-    task = req.body as CourseEntity;
+    task = req.body;
   });
 
   it("GET /task", async () => {
@@ -56,7 +57,12 @@ describe("task", () => {
       .set("Authorization", `Bearer ${token}`);
 
     expect(allTasks.status).toBe(200);
-    expect(allTasks.body).toMatchObject([task]);
+    expect(allTasks.body).toMatchObject([
+      {
+        course_title: "Math 101",
+        tasks: [task],
+      },
+    ]);
 
     const secondTaskObj: CreateTaskDto = {
       name: "second task",
@@ -69,15 +75,19 @@ describe("task", () => {
       .post("/task")
       .send(secondTaskObj)
       .set("Authorization", `Bearer ${token}`);
+    secondTask = secondTaskRes.body as TaskEntity;
 
     allTasks = await request(app.getHttpServer())
       .get("/task")
       .set("Authorization", `Bearer ${token}`);
 
     expect(allTasks.status).toBe(200);
-    expect(allTasks.body).toMatchObject([task, secondTaskRes.body]);
-
-    secondTask = secondTaskRes.body as CourseEntity;
+    expect(allTasks.body).toMatchObject([
+      {
+        course_title: "Math 101",
+        tasks: expect.arrayContaining([task, secondTask]),
+      },
+    ]);
   });
 
   it("GET /task/:id", async () => {
@@ -130,7 +140,12 @@ describe("task", () => {
       .get("/task")
       .set("Authorization", `Bearer ${token}`);
 
-    expect(allTasks.body).toMatchObject([secondTask]);
+    expect(allTasks.body).toMatchObject([
+      {
+        course_title: "Math 101",
+        tasks: [secondTask],
+      },
+    ]);
   });
 
   afterAll(async () => {

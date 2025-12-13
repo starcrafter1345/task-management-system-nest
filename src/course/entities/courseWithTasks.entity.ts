@@ -3,7 +3,7 @@ import { z } from "zod";
 import { TaskEntitySchema } from "../../task/entities/task.entity";
 import { createZodDto } from "nestjs-zod";
 
-export const CourseWithTasksEntitySchema = CourseEntitySchema.extend({
+const CourseWithTasksEntitySchema = CourseEntitySchema.extend({
   tasks: z.array(TaskEntitySchema),
 });
 

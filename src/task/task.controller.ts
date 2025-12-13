@@ -21,6 +21,7 @@ import { ApiBearerAuth } from "@nestjs/swagger";
 import { ZodResponse } from "nestjs-zod";
 import { TaskEntity } from "./entities/task.entity";
 import { StatisticsEntity } from "./dto/statistics.entity";
+import { TasksGroupedByCourse } from "./entities/tasksGroupedByCourse";
 
 @ApiBearerAuth()
 @Controller("task")
@@ -41,7 +42,7 @@ export class TaskController {
   }
 
   @Get()
-  @ZodResponse({ status: HttpStatus.OK, type: [TaskEntity] })
+  @ZodResponse({ status: HttpStatus.OK, type: TasksGroupedByCourse })
   findAll(@User() user: UserPayload) {
     return this.taskService.findAll(+user.sub);
   }

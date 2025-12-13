@@ -8,7 +8,6 @@ import { CourseEntity } from "./entities/course.entity";
 import { CoursesEntity } from "./entities/courses.entity";
 import { CourseWithTasksEntity } from "./entities/courseWithTasks.entity";
 import { TaskEntity } from "../task/entities/task.entity";
-import { CoursesWithTasksEntity } from "./entities/coursesWithTasks.entity";
 
 @Injectable()
 export class CourseService {
@@ -43,24 +42,6 @@ export class CourseService {
     return courses.map(({ _count, ...rest }) => ({
       ...rest,
       taskCount: _count?.tasks ?? 0,
-    }));
-  }
-
-  async findAllWithTasks(user_id: number): Promise<CoursesWithTasksEntity> {
-    const coursesWithTasks = await this.prisma.course.findMany({
-      where: { user_id },
-      include: { tasks: { take: 5 } },
-      omit: { user_id: true },
-    });
-
-    return coursesWithTasks.map((course) => ({
-      ...course,
-      tasks: course.tasks.map((task) => ({
-        ...task,
-        created_at: task.created_at.toISOString(),
-        updated_at: task.updated_at.toISOString(),
-        due_time: task.due_time.toISOString(),
-      })),
     }));
   }
 

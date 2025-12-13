@@ -5,6 +5,7 @@ import { PrismaService } from "../prisma/prisma.service";
 import { Prisma, Task } from "@prisma/client";
 import { TaskEntity } from "./entities/task.entity";
 import { StatisticsEntity } from "./dto/statistics.entity";
+import { TasksGroupedByCourse } from "./entities/tasksGroupedByCourse";
 
 @Injectable()
 export class TaskService {
@@ -59,16 +60,20 @@ export class TaskService {
     };
   }
 
-  async findAll(user_id: number): Promise<TaskEntity[]> {
-    const tasks = await this.prisma.task.findMany({
-      where: { course: { is: { user_id } } },
+  async findAll(user_id: number): Promise<TasksGroupedByCourse> {
+    const coursesWithTasks = await this.prisma.course.findMany({
+      where: { user_id },
+      select: { title: true, tasks: { take: 5, orderBy: { due_time: "asc" } } },
     });
 
-    return tasks.map((task) => ({
-      ...task,
-      created_at: task.created_at.toISOString(),
-      updated_at: task.updated_at.toISOString(),
-      due_time: task.due_time.toISOString(),
+    return coursesWithTasks.map((course) => ({
+      course_title: course.title,
+      tasks: course.tasks.map((task) => ({
+        ...task,
+        created_at: task.created_at.toISOString(),
+        updated_at: task.updated_at.toISOString(),
+        due_time: task.due_time.toISOString(),
+      })),
     }));
   }
 

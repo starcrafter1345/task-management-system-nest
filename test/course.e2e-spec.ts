@@ -35,9 +35,9 @@ describe("course", () => {
     course = req.body as CourseEntity;
   });
 
-  it("GET /course/sidebar", async () => {
+  it("GET /course", async () => {
     let allCourses = await request(app.getHttpServer())
-      .get("/course/sidebar")
+      .get("/course")
       .set("Authorization", `Bearer ${token}`);
 
     expect(allCourses.status).toBe(200);
@@ -51,23 +51,13 @@ describe("course", () => {
       .set("Authorization", `Bearer ${token}`);
 
     allCourses = await request(app.getHttpServer())
-      .get("/course/sidebar")
+      .get("/course")
       .set("Authorization", `Bearer ${token}`);
 
     expect(allCourses.status).toBe(200);
     expect(allCourses.body).toMatchObject([course, engCourseRes.body]);
 
     secondCourse = engCourseRes.body as CourseEntity;
-  });
-
-  it("GET /course/overview", async () => {
-    const allCoursesWithTasks = await request(app.getHttpServer())
-      .get("/course/overview")
-      .set("Authorization", `Bearer ${token}`);
-
-    expect(allCoursesWithTasks.status).toBe(200);
-    expect(allCoursesWithTasks.body).toMatchObject([course, secondCourse]);
-    expect(allCoursesWithTasks.body[0]).toHaveProperty("tasks");
   });
 
   it("GET /course/:id", async () => {
@@ -100,7 +90,7 @@ describe("course", () => {
     expect(deleteCourse.status).toBe(204);
 
     let courses = await request(app.getHttpServer())
-      .get("/course/sidebar")
+      .get("/course")
       .set("Authorization", `Bearer ${token}`);
 
     expect(courses.body).toMatchObject([secondCourse]);
