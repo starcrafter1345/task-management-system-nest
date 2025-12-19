@@ -27,7 +27,7 @@ export class TaskService {
           AND: [
             { course: { is: { user_id } } },
             { completed: { equals: false } },
-            { due_time: { lt: new Date() } },
+            { due_time: { gt: new Date() } },
           ],
         },
       }),
@@ -36,7 +36,7 @@ export class TaskService {
           AND: [
             { course: { is: { user_id } } },
             { completed: { equals: false } },
-            { due_time: { gt: new Date() } },
+            { due_time: { lt: new Date() } },
           ],
         },
       }),
@@ -66,7 +66,7 @@ export class TaskService {
       select: {
         title: true,
         id: true,
-        tasks: { take: 5, orderBy: { due_time: "asc" } },
+        tasks: { take: 4, orderBy: { due_time: "asc" } },
       },
     });
 
