@@ -21,6 +21,7 @@ import { ApiBearerAuth, ApiNoContentResponse } from "@nestjs/swagger";
 import { CourseEntity } from "./entities/course.entity";
 import { ZodResponse } from "nestjs-zod";
 import { CourseWithTasksEntity } from "./entities/courseWithTasks.entity";
+import { TasksGroupedByDate } from "./entities/tasksGroupedByDate";
 import { CoursesEntity } from "./entities/courses.entity";
 
 @ApiBearerAuth()
@@ -53,7 +54,7 @@ export class CourseController {
   @Get(":id")
   @ZodResponse({
     status: HttpStatus.OK,
-    type: CourseWithTasksEntity,
+    type: TasksGroupedByDate,
   })
   async findOne(@Param("id") id: string) {
     const course = await this.courseService.findOne({ id: +id });

@@ -8,6 +8,8 @@ import { CourseEntity } from "./entities/course.entity";
 import { CoursesEntity } from "./entities/courses.entity";
 import { CourseWithTasksEntity } from "./entities/courseWithTasks.entity";
 import { TaskEntity } from "../task/entities/task.entity";
+import { TasksGroupedByDate } from "./entities/tasksGroupedByDate";
+import { formatISO } from "date-fns";
 
 @Injectable()
 export class CourseService {
@@ -47,32 +49,41 @@ export class CourseService {
 
   async findOne(
     courseWhereUniqueInput: Prisma.CourseWhereUniqueInput,
-  ): Promise<CourseWithTasksEntity | null> {
+  ): Promise<TasksGroupedByDate | null> {
     const courseWithTasks = await this.prisma.course.findUnique({
       where: courseWhereUniqueInput,
-      include: {
-        tasks: true,
+      select: {
+        id: true,
+        title: true,
+        tasks: { orderBy: { due_time: "asc" } },
       },
-      omit: { user_id: true },
     });
 
-    if (courseWithTasks) {
-      const transformedTasks = courseWithTasks.tasks.map(
-        (task): TaskEntity => ({
-          ...task,
-          created_at: task.created_at.toISOString(),
-          updated_at: task.updated_at.toISOString(),
-          due_time: task.due_time.toISOString(),
-        }),
-      );
-
-      return {
-        ...courseWithTasks,
-        tasks: transformedTasks,
-      };
+    if (!courseWithTasks) {
+      return null;
     }
 
-    return null;
+    const tasks = courseWithTasks.tasks.reduce(
+      (acc, task) => {
+        const dueTime = formatISO(task.due_time, { representation: "date" });
+        if (!acc[dueTime]) {
+          acc[dueTime] = [];
+        }
+        acc[dueTime].push({
+          ...task,
+          due_time: formatISO(task.due_time),
+          created_at: formatISO(task.created_at),
+          updated_at: formatISO(task.updated_at),
+        });
+        return acc;
+      },
+      {} as Record<string, TaskEntity[]>,
+    );
+
+    return {
+      ...courseWithTasks,
+      tasks,
+    };
   }
 
   async update(

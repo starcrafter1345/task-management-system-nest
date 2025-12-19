@@ -6,9 +6,9 @@ export const TaskEntitySchema = z.object({
   name: z.string(),
   description: z.string().nullable(),
   completed: z.boolean(),
-  due_time: z.iso.datetime(),
-  created_at: z.iso.datetime(),
-  updated_at: z.iso.datetime(),
+  due_time: z.iso.datetime({ offset: true }),
+  created_at: z.iso.datetime({ offset: true }),
+  updated_at: z.iso.datetime({ offset: true }),
   course_id: z.number(),
 });
 

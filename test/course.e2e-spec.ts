@@ -66,7 +66,11 @@ describe("course", () => {
       .set("Authorization", `Bearer ${token}`);
 
     expect(mathCourse.status).toBe(200);
-    expect(mathCourse.body).toMatchObject(course);
+    expect(mathCourse.body).toMatchObject({
+      id: course.id,
+      title: course.title,
+      tasks: {},
+    });
     expect(mathCourse.body).toHaveProperty("tasks");
   });
 

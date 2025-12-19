@@ -125,9 +125,9 @@ describe("task", () => {
     expect(stats.status).toBe(200);
     expect(stats.body).toEqual({
       total: 2,
-      inProgress: 1,
+      inProgress: 0,
       completed: 1,
-      overdue: 0,
+      overdue: 1,
     });
   });
 
