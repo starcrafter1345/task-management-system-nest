@@ -76,7 +76,8 @@ describe("auth", () => {
       .send(user);
 
     expect(login.status).toBe(200);
-    expect(login.body).toHaveProperty("access_token");
+    expect(login.headers["set-cookie"]).toBeDefined();
+    expect(login.headers["set-cookie"][0]).toContain("Authentication=");
   });
 
   it("should return unauthorized error, if typed wrong password", async () => {
@@ -91,7 +92,7 @@ describe("auth", () => {
       .send(user);
 
     expect(login.status).toBe(401);
-    expect(login.body).toMatchObject({ message: "Invalid credentials" });
+    expect(login.body).toMatchObject({ message: "Unauthorized" });
   });
 
   afterAll(async () => {

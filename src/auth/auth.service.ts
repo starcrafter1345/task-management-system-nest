@@ -1,7 +1,6 @@
 import {
   BadRequestException,
   Injectable,
-  NotFoundException,
   UnauthorizedException,
 } from "@nestjs/common";
 import { CreateUserDto } from "./dto/create-user.dto";
@@ -10,6 +9,8 @@ import { UserService } from "../user/user.service";
 import bcrypt from "bcrypt";
 import { Prisma } from "@prisma/client";
 import { JwtService } from "@nestjs/jwt";
+import { TokenDto } from "./dto/token.dto";
+import { RefinedUserDto } from "./dto/refined-user.dto";
 
 @Injectable()
 export class AuthService {
@@ -36,7 +37,7 @@ export class AuthService {
         email,
       });
 
-      const payload = { sub: newUser.id, username: newUser.name };
+      const payload = { sub: newUser.id, email: newUser.email };
       return this.accessTokenGenerator(payload);
     } catch (err: unknown) {
       if (err instanceof Prisma.PrismaClientKnownRequestError) {
@@ -47,18 +48,35 @@ export class AuthService {
     }
   }
 
-  async login({ email, password }: CredentialsDto) {
+  async login(user: RefinedUserDto) {
+    const payload = { sub: user.id, email: user.email };
+    return this.accessTokenGenerator(payload);
+  }
+
+  async validateUser({
+    email,
+    password,
+  }: CredentialsDto): Promise<RefinedUserDto | null> {
     const user = await this.userService.findUser({ email });
+
     if (!user) {
-      throw new NotFoundException();
+      return null;
     }
 
     const isMatch = await bcrypt.compare(password, user.hashed_password);
-    if (!isMatch) {
-      throw new UnauthorizedException("Invalid credentials");
+    if (isMatch) {
+      const { hashed_password, ...result } = user;
+      return result;
     }
 
-    const payload = { sub: user.id, username: user.name };
-    return this.accessTokenGenerator(payload);
+    return null;
+  }
+
+  async verify({ access_token }: TokenDto) {
+    try {
+      await this.jwtService.verifyAsync(access_token);
+    } catch (err: unknown) {
+      throw new UnauthorizedException("Invalid token");
+    }
   }
 }

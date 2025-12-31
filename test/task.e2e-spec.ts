@@ -1,6 +1,5 @@
 import request from "supertest";
 import { INestApplication } from "@nestjs/common";
-import { CreateCourseDto } from "../src/course/dto/create-course.dto";
 import { PrismaService } from "../src/prisma/prisma.service";
 import { settingUpApp } from "./utils";
 import { CourseEntity } from "../src/course/entities/course.entity";
@@ -26,7 +25,7 @@ describe("task", () => {
     const newCourse = await request(app.getHttpServer())
       .post("/course")
       .send({ title: "Math 101", color: "#ffffff" })
-      .set("Authorization", `Bearer ${token}`);
+      .set("Cookie", `Authentication=${token}`);
 
     course = newCourse.body as CourseEntity;
   });
@@ -43,7 +42,7 @@ describe("task", () => {
     const req = await request(app.getHttpServer())
       .post("/task")
       .send(newTask)
-      .set("Authorization", `Bearer ${token}`);
+      .set("Cookie", `Authentication=${token}`);
 
     expect(req.status).toBe(201);
     expect(req.body).toMatchObject(newTask);
@@ -54,7 +53,7 @@ describe("task", () => {
   it("GET /task", async () => {
     let allTasks = await request(app.getHttpServer())
       .get("/task")
-      .set("Authorization", `Bearer ${token}`);
+      .set("Cookie", `Authentication=${token}`);
 
     expect(allTasks.status).toBe(200);
     expect(allTasks.body).toMatchObject([
@@ -75,12 +74,12 @@ describe("task", () => {
     const secondTaskRes = await request(app.getHttpServer())
       .post("/task")
       .send(secondTaskObj)
-      .set("Authorization", `Bearer ${token}`);
+      .set("Cookie", `Authentication=${token}`);
     secondTask = secondTaskRes.body as TaskEntity;
 
     allTasks = await request(app.getHttpServer())
       .get("/task")
-      .set("Authorization", `Bearer ${token}`);
+      .set("Cookie", `Authentication=${token}`);
 
     expect(allTasks.status).toBe(200);
     expect(allTasks.body).toMatchObject([
@@ -95,7 +94,7 @@ describe("task", () => {
   it("GET /task/:id", async () => {
     let mathTask = await request(app.getHttpServer())
       .get(`/task/${task.id}`)
-      .set("Authorization", `Bearer ${token}`);
+      .set("Cookie", `Authentication=${token}`);
 
     expect(mathTask.status).toBe(200);
     expect(mathTask.body).toMatchObject(task);
@@ -105,7 +104,7 @@ describe("task", () => {
     const changedTask = await request(app.getHttpServer())
       .patch(`/task/${task.id}`)
       .send({ description: "normal description" })
-      .set("Authorization", `Bearer ${token}`);
+      .set("Cookie", `Authentication=${token}`);
 
     expect(changedTask.status).toBe(200);
     expect(changedTask.body).toMatchObject({
@@ -120,7 +119,7 @@ describe("task", () => {
   it("GET /task/stats", async () => {
     const stats = await request(app.getHttpServer())
       .get("/task/stats")
-      .set("Authorization", `Bearer ${token}`);
+      .set("Cookie", `Authentication=${token}`);
 
     expect(stats.status).toBe(200);
     expect(stats.body).toEqual({
@@ -134,13 +133,13 @@ describe("task", () => {
   it("DELETE /task/:id", async () => {
     let deleteTask = await request(app.getHttpServer())
       .delete(`/task/${task.id}`)
-      .set("Authorization", `Bearer ${token}`);
+      .set("Cookie", `Authentication=${token}`);
 
     expect(deleteTask.status).toBe(204);
 
     let allTasks = await request(app.getHttpServer())
       .get("/task")
-      .set("Authorization", `Bearer ${token}`);
+      .set("Cookie", `Authentication=${token}`);
 
     expect(allTasks.body).toMatchObject([
       {

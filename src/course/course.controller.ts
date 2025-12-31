@@ -14,19 +14,18 @@ import {
 import { CourseService } from "./course.service";
 import { CreateCourseDto } from "./dto/create-course.dto";
 import { UpdateCourseDto } from "./dto/update-course.dto";
-import { AuthGuard } from "../auth/auth.guard";
 import { User } from "../auth/user.decorator";
-import type { UserPayload } from "../auth/user-payload";
 import { ApiBearerAuth, ApiNoContentResponse } from "@nestjs/swagger";
 import { CourseEntity } from "./entities/course.entity";
 import { ZodResponse } from "nestjs-zod";
-import { CourseWithTasksEntity } from "./entities/courseWithTasks.entity";
 import { TasksGroupedByDate } from "./entities/tasksGroupedByDate";
 import { CoursesEntity } from "./entities/courses.entity";
+import { JwtAuthGuard } from "../auth/guards/jwt-auth.guard";
+import { RefinedUserDto } from "../auth/dto/refined-user.dto";
 
 @ApiBearerAuth()
 @Controller("course")
-@UseGuards(AuthGuard)
+@UseGuards(JwtAuthGuard)
 export class CourseController {
   constructor(private readonly courseService: CourseService) {}
 
@@ -36,7 +35,7 @@ export class CourseController {
     type: CourseEntity,
   })
   create(
-    @User() user: UserPayload,
+    @User() user: RefinedUserDto,
     @Body() createCourseDto: CreateCourseDto,
   ): Promise<CourseEntity> {
     return this.courseService.create(createCourseDto, user);
@@ -47,8 +46,8 @@ export class CourseController {
     status: HttpStatus.OK,
     type: CoursesEntity,
   })
-  findAll(@User() user: UserPayload) {
-    return this.courseService.findAll(+user.sub);
+  findAll(@User() user: RefinedUserDto) {
+    return this.courseService.findAll(user.id);
   }
 
   @Get(":id")

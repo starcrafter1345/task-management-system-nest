@@ -27,7 +27,7 @@ describe("course", () => {
     const req = await request(app.getHttpServer())
       .post("/course")
       .send(newCourse)
-      .set("Authorization", `Bearer ${token}`);
+      .set("Cookie", `Authentication=${token}`);
 
     expect(req.status).toBe(201);
     expect(req.body).toMatchObject(newCourse);
@@ -38,7 +38,7 @@ describe("course", () => {
   it("GET /course", async () => {
     let allCourses = await request(app.getHttpServer())
       .get("/course")
-      .set("Authorization", `Bearer ${token}`);
+      .set("Cookie", `Authentication=${token}`);
 
     expect(allCourses.status).toBe(200);
     expect(allCourses.body).toMatchObject([course]);
@@ -48,11 +48,11 @@ describe("course", () => {
     const engCourseRes = await request(app.getHttpServer())
       .post("/course")
       .send(engCourse)
-      .set("Authorization", `Bearer ${token}`);
+      .set("Cookie", `Authentication=${token}`);
 
     allCourses = await request(app.getHttpServer())
       .get("/course")
-      .set("Authorization", `Bearer ${token}`);
+      .set("Cookie", `Authentication=${token}`);
 
     expect(allCourses.status).toBe(200);
     expect(allCourses.body).toMatchObject([course, engCourseRes.body]);
@@ -63,7 +63,7 @@ describe("course", () => {
   it("GET /course/:id", async () => {
     let mathCourse = await request(app.getHttpServer())
       .get(`/course/${course.id}`)
-      .set("Authorization", `Bearer ${token}`);
+      .set("Cookie", `Authentication=${token}`);
 
     expect(mathCourse.status).toBe(200);
     expect(mathCourse.body).toMatchObject({
@@ -78,7 +78,7 @@ describe("course", () => {
     const changedCourse = await request(app.getHttpServer())
       .patch(`/course/${course.id}`)
       .send({ color: "#ff0000" })
-      .set("Authorization", `Bearer ${token}`);
+      .set("Cookie", `Authentication=${token}`);
 
     expect(changedCourse.status).toBe(200);
     expect(changedCourse.body).toStrictEqual({ ...course, color: "#ff0000" });
@@ -89,13 +89,13 @@ describe("course", () => {
   it("DELETE /course/:id", async () => {
     let deleteCourse = await request(app.getHttpServer())
       .delete(`/course/${course.id}`)
-      .set("Authorization", `Bearer ${token}`);
+      .set("Cookie", `Authentication=${token}`);
 
     expect(deleteCourse.status).toBe(204);
 
     let courses = await request(app.getHttpServer())
       .get("/course")
-      .set("Authorization", `Bearer ${token}`);
+      .set("Cookie", `Authentication=${token}`);
 
     expect(courses.body).toMatchObject([secondCourse]);
   });
@@ -104,7 +104,7 @@ describe("course", () => {
     const newCourse = await request(app.getHttpServer())
       .post("/course")
       .send({ title: "Course", color: "#ff" })
-      .set("Authorization", `Bearer ${token}`);
+      .set("Cookie", `Authentication=${token}`);
 
     expect(newCourse.status).toBe(400);
     expect(newCourse.body).toMatchObject({

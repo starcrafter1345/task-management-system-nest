@@ -3,13 +3,12 @@ import { CreateCourseDto } from "./dto/create-course.dto";
 import { UpdateCourseDto } from "./dto/update-course.dto";
 import { PrismaService } from "../prisma/prisma.service";
 import { Prisma } from "@prisma/client";
-import type { UserPayload } from "../auth/user-payload";
 import { CourseEntity } from "./entities/course.entity";
 import { CoursesEntity } from "./entities/courses.entity";
-import { CourseWithTasksEntity } from "./entities/courseWithTasks.entity";
 import { TaskEntity } from "../task/entities/task.entity";
 import { TasksGroupedByDate } from "./entities/tasksGroupedByDate";
 import { formatISO } from "date-fns";
+import { RefinedUserDto } from "src/auth/dto/refined-user.dto";
 
 @Injectable()
 export class CourseService {
@@ -17,13 +16,13 @@ export class CourseService {
 
   async create(
     createCourseDto: CreateCourseDto,
-    user: UserPayload,
+    user: RefinedUserDto,
   ): Promise<CourseEntity> {
     return this.prisma.course.create({
       data: {
         ...createCourseDto,
         user: {
-          connect: { id: Number(user.sub) },
+          connect: { id: Number(user.id) },
         },
       },
       omit: {

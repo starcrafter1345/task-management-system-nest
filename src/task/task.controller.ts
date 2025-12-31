@@ -14,25 +14,25 @@ import {
 import { TaskService } from "./task.service";
 import { CreateTaskDto } from "./dto/create-task.dto";
 import { UpdateTaskDto } from "./dto/update-task.dto";
-import { AuthGuard } from "../auth/auth.guard";
 import { User } from "../auth/user.decorator";
-import type { UserPayload } from "../auth/user-payload";
 import { ApiBearerAuth } from "@nestjs/swagger";
 import { ZodResponse } from "nestjs-zod";
 import { TaskEntity } from "./entities/task.entity";
 import { StatisticsEntity } from "./dto/statistics.entity";
 import { TasksGroupedByCourse } from "./entities/tasksGroupedByCourse";
+import { JwtAuthGuard } from "../auth/guards/jwt-auth.guard";
+import { RefinedUserDto } from "../auth/dto/refined-user.dto";
 
 @ApiBearerAuth()
 @Controller("task")
-@UseGuards(AuthGuard)
+@UseGuards(JwtAuthGuard)
 export class TaskController {
   constructor(private readonly taskService: TaskService) {}
 
   @Get("/stats")
   @ZodResponse({ status: HttpStatus.OK, type: StatisticsEntity })
-  stats(@User() user: UserPayload) {
-    return this.taskService.stats(+user.sub);
+  stats(@User() user: RefinedUserDto) {
+    return this.taskService.stats(user.id);
   }
 
   @Post()
@@ -43,8 +43,8 @@ export class TaskController {
 
   @Get()
   @ZodResponse({ status: HttpStatus.OK, type: TasksGroupedByCourse })
-  findAll(@User() user: UserPayload) {
-    return this.taskService.findAll(+user.sub);
+  findAll(@User() user: RefinedUserDto) {
+    return this.taskService.findAll(user.id);
   }
 
   @Get(":id")
