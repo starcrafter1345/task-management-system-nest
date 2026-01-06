@@ -20,7 +20,10 @@ describe("task", () => {
     const req = await request(app.getHttpServer())
       .post("/auth/register")
       .send({ username: "test", email: "test2@test.com", password: "test" });
-    token = req.body.access_token;
+    
+    const cookies = req.headers["set-cookie"];
+    const authCookie = cookies.find((c: string) => c.startsWith("Authentication="));
+    token = authCookie.split(";")[0].split("=")[1];
 
     const newCourse = await request(app.getHttpServer())
       .post("/course")

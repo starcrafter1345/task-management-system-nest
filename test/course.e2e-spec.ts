@@ -18,7 +18,10 @@ describe("course", () => {
     const req = await request(app.getHttpServer())
       .post("/auth/register")
       .send({ username: "test", email: "test@test.com", password: "test" });
-    token = req.body.access_token;
+    
+    const cookies = req.headers["set-cookie"];
+    const authCookie = cookies.find((c: string) => c.startsWith("Authentication="));
+    token = authCookie.split(";")[0].split("=")[1];
   });
 
   it("POST /course", async () => {

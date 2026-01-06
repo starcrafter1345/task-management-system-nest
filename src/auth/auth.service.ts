@@ -38,13 +38,18 @@ export class AuthService {
       });
 
       const payload = { sub: newUser.id, email: newUser.email };
-      return this.accessTokenGenerator(payload);
+      const { access_token } = await this.accessTokenGenerator(payload);
+
+      const { hashed_password: _, ...user } = newUser;
+
+      return { access_token, user };
     } catch (err: unknown) {
       if (err instanceof Prisma.PrismaClientKnownRequestError) {
         if (err.code === "P2002") {
           throw new BadRequestException("Need to use unique email");
         }
       }
+      throw err;
     }
   }
 
@@ -70,13 +75,5 @@ export class AuthService {
     }
 
     return null;
-  }
-
-  async verify({ access_token }: TokenDto) {
-    try {
-      await this.jwtService.verifyAsync(access_token);
-    } catch (err: unknown) {
-      throw new UnauthorizedException("Invalid token");
-    }
   }
 }

@@ -22,7 +22,11 @@ describe("auth", () => {
       .send(user);
 
     expect(register.status).toBe(201);
-    expect(register.body).toHaveProperty("access_token");
+    expect(register.headers["set-cookie"]).toBeDefined();
+    expect(register.headers["set-cookie"][0]).toContain("Authentication=");
+    expect(register.body).toHaveProperty("id");
+    expect(register.body).toHaveProperty("email", user.email);
+    expect(register.body).toHaveProperty("name", user.username);
   });
 
   it("should not make new user, if one is already there", async () => {
@@ -78,6 +82,9 @@ describe("auth", () => {
     expect(login.status).toBe(200);
     expect(login.headers["set-cookie"]).toBeDefined();
     expect(login.headers["set-cookie"][0]).toContain("Authentication=");
+    expect(login.body).toHaveProperty("id");
+    expect(login.body).toHaveProperty("email", user.email);
+    expect(login.body).toHaveProperty("name", user.username);
   });
 
   it("should return unauthorized error, if typed wrong password", async () => {
@@ -93,6 +100,35 @@ describe("auth", () => {
 
     expect(login.status).toBe(401);
     expect(login.body).toMatchObject({ message: "Unauthorized" });
+  });
+
+  it("GET /verify", async () => {
+    const user: CreateUserDto = {
+      username: "starc",
+      email: "starc@email.com",
+      password: "secretpassword",
+    };
+
+    const login = await request(app.getHttpServer())
+      .post("/auth/login")
+      .send(user);
+
+    const cookie = login.headers["set-cookie"];
+
+    const verify = await request(app.getHttpServer())
+      .get("/auth/verify")
+      .set("Cookie", cookie);
+
+    expect(verify.status).toBe(200);
+    expect(verify.body).toHaveProperty("id");
+    expect(verify.body).toHaveProperty("email", user.email);
+    expect(verify.body).toHaveProperty("name", user.username);
+  });
+
+  it("should return unauthorized if no cookie", async () => {
+    const verify = await request(app.getHttpServer()).get("/auth/verify");
+
+    expect(verify.status).toBe(401);
   });
 
   afterAll(async () => {
