@@ -74,7 +74,7 @@ export class AuthController {
       httpOnly: true,
       expires: expiresAccessToken,
       secure: this.config.getOrThrow<string>("NODE_ENV") === "production",
-      sameSite: "lax",
+      sameSite: "none",
     });
 
     return user;
