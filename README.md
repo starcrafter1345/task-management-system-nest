@@ -149,12 +149,3 @@ pnpm run test:cov
 | `pnpm run test:cov` | Generate test coverage report |
 | `pnpm run lint` | Lint and auto-fix |
 | `pnpm run format` | Format code with Prettier |
-
----
-
-## Roadmap
-
-- [x] Auth module (register, login, JWT)
-- [x] Courses module
-- [x] E2E tests for auth and courses
-- [ ] Tasks module
