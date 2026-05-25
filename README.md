@@ -2,7 +2,7 @@
 
 A RESTful API built with **NestJS** and **TypeScript**, featuring JWT authentication, Prisma ORM, Zod validation, Swagger docs, and a Dockerized PostgreSQL database.
 
-> Frontend: [task-management-system](https://github.com/starcrafter1345/task-management-system-frontend)
+> Frontend: [task-management-system-frontend](https://github.com/starcrafter1345/task-management-system-frontend)
 
 ---
 
